@@ -1,16 +1,17 @@
 import React from 'react';
 import { ChannelList } from './ChannelList';
-import './chat.scss';
 import { MessagesPanel } from './MessagesPanel';
-import socketClient from 'socket.io-client';
-const SERVER = 'https://tcg-s-publi-w62ssjnjl94k-1461001986.ap-southeast-1.elb.amazonaws.com';
+// const SERVER = 'https://tcg-s-Publi-B8EJ4H80Q34M-515525795.ap-southeast-1.elb.amazonaws.com';
 // const SERVER = 'http://localhost:2000';
+import socketClient from 'socket.io-client';
+import './chat.css';
+const SERVER = 'http://localhost:3000';
 const CHANNELS_URL = SERVER + '/tests/getChannels';
 export class Chat extends React.Component {
   state = {
     channels: null,
     socket: null,
-    channel: null
+    channel: null,
   };
   socket;
   componentDidMount() {
@@ -22,7 +23,7 @@ export class Chat extends React.Component {
     var socket = socketClient(SERVER, {
       withCredentials: false,
       reconnectionAttempts: 10,
-      timeout: 10000
+      timeout: 10000,
       //   transports: ['websocket', 'polling']
     });
 
@@ -34,8 +35,8 @@ export class Chat extends React.Component {
 
     socket.on('destroyedDevices', (data) => {
       console.log('destroy event');
-      console.log(data)
-    })
+      console.log(data);
+    });
     socket.on('channel', (channel) => {
       let channels = this.state.channels;
       channels.forEach((c) => {
@@ -62,10 +63,14 @@ export class Chat extends React.Component {
   };
 
   loadChannels = async () => {
-    fetch(CHANNELS_URL).then(async (response) => {
-      let data = await response.json();
-      this.setState({ channels: data.channels });
-    });
+    try {
+      fetch(CHANNELS_URL).then(async (response) => {
+        let data = await response.json();
+        this.setState({ channels: data.channels });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   handleChannelSelect = (id) => {
